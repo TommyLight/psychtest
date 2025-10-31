@@ -81,6 +81,8 @@
             flex-direction: column;
             gap: 15px;
             margin-bottom: 30px;
+            /* 确保选项容器高度稳定 */
+            align-items: stretch;
         }
         
         .option {
@@ -94,6 +96,8 @@
             text-align: left;
             /* 关键修复：预置透明边框，保持布局稳定 */
             border-left: 4px solid transparent;
+            /* 设置固定高度防止抖动 */
+            min-height: 60px;
         }
         
         .option:hover {
@@ -204,6 +208,12 @@
             word-break: break-all;
         }
         
+        .share-link a {
+            color: #1a73e8;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        
         .footer {
             text-align: center;
             margin-top: 30px;
@@ -233,6 +243,10 @@
             
             .btn {
                 width: 100%;
+            }
+            
+            .option {
+                min-height: 70px;
             }
         }
     </style>
@@ -271,7 +285,7 @@
             
             <div class="share-link">
                 <p>保存此链接可随时查看你的测试结果：</p>
-                <p id="share-url"></p>
+                <p><a href="#" id="share-url">点击查看测试结果</a></p>
             </div>
             
             <button class="btn" id="retest-btn">重新测试</button>
@@ -324,6 +338,32 @@
                 }
                 // 解码Base64
                 return atob(base64);
+            }
+            
+            // Cookie操作函数
+            function setCookie(name, value, days) {
+                let expires = "";
+                if (days) {
+                    const date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            }
+            
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+            
+            function deleteCookie(name) {
+                document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
             }
             
             // 生成90道题目数据
@@ -482,25 +522,47 @@
                 }
             });
             
-            // 检查URL参数，如果有答案则显示结果
+            // 检查URL参数或Cookie，如果有答案则显示结果
             const urlParams = new URLSearchParams(window.location.search);
             const encodedAnswers = urlParams.get('r');
+            
             if (encodedAnswers) {
+                // 优先使用URL参数
                 try {
                     const answers = decodeAnswers(encodedAnswers);
                     if (answers.length === 90) {
                         userAnswers = answers.split('');
+                        // 保存到Cookie
+                        setCookie('psychTestAnswers', encodedAnswers, 30);
                         showResults();
                     }
                 } catch (e) {
-                    console.error('解析答案时出错:', e);
+                    console.error('解析URL答案时出错:', e);
+                }
+            } else {
+                // 检查Cookie
+                const cookieAnswers = getCookie('psychTestAnswers');
+                if (cookieAnswers) {
+                    try {
+                        const answers = decodeAnswers(cookieAnswers);
+                        if (answers.length === 90) {
+                            userAnswers = answers.split('');
+                            // 更新URL但不刷新页面
+                            const newUrl = window.location.origin + window.location.pathname + '?r=' + cookieAnswers;
+                            window.history.replaceState({}, '', newUrl);
+                            showResults();
+                        }
+                    } catch (e) {
+                        console.error('解析Cookie答案时出错:', e);
+                    }
                 }
             }
             
             // 重新测试按钮事件
             retestBtn.addEventListener('click', function() {
-                // 清除URL参数
+                // 清除URL参数和Cookie
                 window.history.replaceState({}, '', window.location.pathname);
+                deleteCookie('psychTestAnswers');
                 
                 // 重置数据
                 currentQuestionIndex = 0;
@@ -531,7 +593,11 @@
                 const newUrl = window.location.origin + window.location.pathname + '?r=' + encodedAnswers;
                 window.history.replaceState({}, '', newUrl);
                 
-                // 显示分享链接
+                // 保存到Cookie
+                setCookie('psychTestAnswers', encodedAnswers, 30);
+                
+                // 设置分享链接
+                shareUrl.href = newUrl;
                 shareUrl.textContent = newUrl;
                 
                 // 显示结果，隐藏测验
