@@ -1,1 +1,490 @@
-index
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个性心理测验</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark-color);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .question {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background-color: var(--light-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background-color: #e6e9f0;
+            transform: translateY(-2px);
+        }
+        
+        .option.selected {
+            background-color: #e1e8f7;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .option input {
+            margin-right: 10px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .result h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .result-content {
+            background-color: var(--light-color);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: left;
+            line-height: 1.6;
+        }
+        
+        .result-score {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        .result-description {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .share-link {
+            background-color: #f0f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>个性心理测验</h1>
+            <p class="subtitle">探索你的内心世界，发现真实的自己</p>
+        </header>
+        
+        <div class="content" id="quiz-container">
+            <div class="question">
+                <h3>1. 当你遇到压力时，你通常会：</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q1" value="a"> 独自思考并寻找解决方案
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1" value="b"> 寻求朋友或家人的帮助
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1" value="c"> 通过运动或爱好来释放压力
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1" value="d"> 暂时逃避，希望问题自行解决
+                    </label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>2. 在社交场合中，你通常是：</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q2" value="a"> 活跃的焦点，善于带动气氛
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2" value="b"> 安静的观察者，选择性参与
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2" value="c"> 介于两者之间，视情况而定
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2" value="d"> 感到不适，尽量提前离开
+                    </label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>3. 关于未来，你的态度是：</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q3" value="a"> 充满期待，积极规划
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3" value="b"> 有些担忧，但尽量保持乐观
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3" value="c"> 顺其自然，不刻意规划
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3" value="d"> 感到焦虑，不确定未来会怎样
+                    </label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>4. 当你做决定时，你更倾向于：</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q4" value="a"> 理性分析利弊，做出最优选择
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4" value="b"> 听从内心的感觉和直觉
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4" value="c"> 征求他人意见，再做决定
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4" value="d"> 犹豫不决，害怕做出错误选择
+                    </label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>5. 对于新环境或新挑战，你的第一反应是：</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="q5" value="a"> 兴奋和期待，跃跃欲试
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q5" value="b"> 谨慎评估风险和可能性
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q5" value="c"> 感到紧张，但会努力适应
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q5" value="d"> 抗拒变化，希望保持现状
+                    </label>
+                </div>
+            </div>
+            
+            <button class="btn" id="submit-btn">查看我的测试结果</button>
+        </div>
+        
+        <div class="result" id="result-container">
+            <h2>你的个性分析报告</h2>
+            
+            <div class="result-content">
+                <div class="result-score" id="score-display"></div>
+                <div class="result-description" id="result-description"></div>
+                <div id="personality-traits"></div>
+            </div>
+            
+            <div class="share-link">
+                <p>保存此链接可随时查看你的测试结果：</p>
+                <p id="share-url"></p>
+            </div>
+            
+            <button class="btn" id="retest-btn">重新测试</button>
+        </div>
+        
+        <div class="footer">
+            <p>本测验结果仅供参考，不代表专业心理评估</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizContainer = document.getElementById('quiz-container');
+            const resultContainer = document.getElementById('result-container');
+            const submitBtn = document.getElementById('submit-btn');
+            const retestBtn = document.getElementById('retest-btn');
+            const scoreDisplay = document.getElementById('score-display');
+            const resultDescription = document.getElementById('result-description');
+            const personalityTraits = document.getElementById('personality-traits');
+            const shareUrl = document.getElementById('share-url');
+            
+            // 为选项添加点击效果
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // 移除同一问题中其他选项的选中状态
+                    const question = this.closest('.question');
+                    question.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 添加当前选项的选中状态
+                    this.classList.add('selected');
+                });
+            });
+            
+            // 检查URL参数，如果有答案则显示结果
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('q1')) {
+                showResults();
+            }
+            
+            // 提交按钮事件
+            submitBtn.addEventListener('click', function() {
+                // 检查是否所有问题都已回答
+                const allAnswered = document.querySelectorAll('input[type="radio"]:checked').length === 5;
+                
+                if (!allAnswered) {
+                    alert('请回答所有问题后再提交！');
+                    return;
+                }
+                
+                // 收集答案并构建URL参数
+                const answers = {};
+                for (let i = 1; i <= 5; i++) {
+                    const questionName = 'q' + i;
+                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                    answers[questionName] = selectedOption.value;
+                }
+                
+                // 构建带参数的URL
+                const params = new URLSearchParams(answers);
+                const newUrl = window.location.origin + window.location.pathname + '?' + params.toString();
+                
+                // 更新URL但不刷新页面
+                window.history.replaceState({}, '', newUrl);
+                
+                // 显示结果
+                showResults();
+            });
+            
+            // 重新测试按钮事件
+            retestBtn.addEventListener('click', function() {
+                // 清除URL参数
+                window.history.replaceState({}, '', window.location.pathname);
+                
+                // 重置表单
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                
+                document.querySelectorAll('.option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // 显示测验，隐藏结果
+                quizContainer.style.display = 'block';
+                resultContainer.style.display = 'none';
+            });
+            
+            // 显示结果函数
+            function showResults() {
+                // 收集答案
+                const answers = {};
+                for (let i = 1; i <= 5; i++) {
+                    const questionName = 'q' + i;
+                    const urlParam = urlParams.get(questionName);
+                    
+                    if (urlParam) {
+                        answers[questionName] = urlParam;
+                        
+                        // 在表单中选中对应的选项
+                        const radio = document.querySelector(`input[name="${questionName}"][value="${urlParam}"]`);
+                        if (radio) {
+                            radio.checked = true;
+                            radio.closest('.option').classList.add('selected');
+                        }
+                    }
+                }
+                
+                // 计算得分和生成报告
+                const score = calculateScore(answers);
+                const report = generateReport(score, answers);
+                
+                // 更新结果页面
+                scoreDisplay.textContent = `你的个性得分: ${score}/25`;
+                resultDescription.textContent = report.description;
+                personalityTraits.innerHTML = report.traits;
+                
+                // 显示分享链接
+                shareUrl.textContent = window.location.href;
+                
+                // 显示结果，隐藏测验
+                quizContainer.style.display = 'none';
+                resultContainer.style.display = 'block';
+            }
+            
+            // 计算得分函数
+            function calculateScore(answers) {
+                let score = 0;
+                
+                // 为每个答案分配分数
+                const scoring = {
+                    q1: { a: 4, b: 3, c: 5, d: 2 },
+                    q2: { a: 5, b: 4, c: 3, d: 2 },
+                    q3: { a: 5, b: 4, c: 3, d: 2 },
+                    q4: { a: 4, b: 5, c: 3, d: 2 },
+                    q5: { a: 5, b: 4, c: 3, d: 2 }
+                };
+                
+                for (let i = 1; i <= 5; i++) {
+                    const questionName = 'q' + i;
+                    if (answers[questionName]) {
+                        score += scoring[questionName][answers[questionName]];
+                    }
+                }
+                
+                return score;
+            }
+            
+            // 生成报告函数
+            function generateReport(score, answers) {
+                let description = '';
+                let traits = '<h3>你的主要个性特征：</h3><ul>';
+                
+                if (score >= 20) {
+                    description = '你是一个积极乐观、适应力强的人。你善于面对挑战，在社交场合中游刃有余，对未来充满信心。你的决策通常基于理性分析和内心直觉的平衡。';
+                    traits += '<li>积极乐观</li><li>适应力强</li><li>善于社交</li><li>决策平衡</li>';
+                } else if (score >= 15) {
+                    description = '你是一个谨慎而稳重的人。你在社交和独处之间找到了良好的平衡，对未来既有期待也有适当的担忧。你的决策过程较为全面，会考虑多方因素。';
+                    traits += '<li>谨慎稳重</li><li>平衡社交</li><li>全面思考</li><li>适度担忧</li>';
+                } else {
+                    description = '你是一个内向而敏感的人。你更倾向于独处和思考，对新环境和变化需要更多时间适应。你的决策往往基于内心感受，有时可能会犹豫不决。';
+                    traits += '<li>内向敏感</li><li>善于思考</li><li>决策感性</li><li>需要适应期</li>';
+                }
+                
+                traits += '</ul>';
+                
+                // 根据具体答案添加个性化描述
+                if (answers.q1 === 'c') {
+                    traits += '<p>你擅长通过积极的方式（如运动或爱好）来应对压力，这是一种健康的压力管理策略。</p>';
+                }
+                
+                if (answers.q2 === 'a') {
+                    traits += '<p>你在社交场合中如鱼得水，具备良好的社交能力和领导潜力。</p>';
+                }
+                
+                if (answers.q4 === 'a') {
+                    traits += '<p>你的决策方式偏向理性分析，这使你在复杂情况下能做出较为客观的判断。</p>';
+                }
+                
+                return {
+                    description: description,
+                    traits: traits
+                };
+            }
+        });
+    </script>
+</body>
+</html>
