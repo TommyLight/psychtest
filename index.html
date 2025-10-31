@@ -317,6 +317,38 @@
             const personalityTraits = document.getElementById('personality-traits');
             const shareUrl = document.getElementById('share-url');
             
+            // 简单映射加密函数
+            function encrypt(text) {
+                const mapping = {
+                    'a': 'z',
+                    'b': 'w',
+                    'c': 'a',
+                    'd': '0'
+                };
+                
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += mapping[text[i]];
+                }
+                return result;
+            }
+            
+            // 简单映射解密函数
+            function decrypt(text) {
+                const reverseMapping = {
+                    'z': 'a',
+                    'w': 'b',
+                    'a': 'c',
+                    '0': 'd'
+                };
+                
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += reverseMapping[text[i]];
+                }
+                return result;
+            }
+            
             // 为选项添加点击效果
             document.querySelectorAll('.option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -336,8 +368,14 @@
             
             // 检查URL参数，如果有答案则显示结果
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('q1')) {
-                showResults();
+            const encodedAnswers = urlParams.get('r');
+            if (encodedAnswers) {
+                try {
+                    const answers = decrypt(encodedAnswers);
+                    showResults(answers);
+                } catch (e) {
+                    console.error('解析答案时出错:', e);
+                }
             }
             
             // 提交按钮事件
@@ -350,23 +388,25 @@
                     return;
                 }
                 
-                // 收集答案并构建URL参数
-                const answers = {};
+                // 收集答案并构建字符串
+                let answerStr = '';
                 for (let i = 1; i <= 5; i++) {
                     const questionName = 'q' + i;
                     const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-                    answers[questionName] = selectedOption.value;
+                    answerStr += selectedOption.value;
                 }
                 
+                // 加密答案
+                const encodedAnswers = encrypt(answerStr);
+                
                 // 构建带参数的URL
-                const params = new URLSearchParams(answers);
-                const newUrl = window.location.origin + window.location.pathname + '?' + params.toString();
+                const newUrl = window.location.origin + window.location.pathname + '?r=' + encodedAnswers;
                 
                 // 更新URL但不刷新页面
                 window.history.replaceState({}, '', newUrl);
                 
                 // 显示结果
-                showResults();
+                showResults(answerStr);
             });
             
             // 重新测试按钮事件
@@ -389,28 +429,35 @@
             });
             
             // 显示结果函数
-            function showResults() {
-                // 收集答案
-                const answers = {};
-                for (let i = 1; i <= 5; i++) {
-                    const questionName = 'q' + i;
-                    const urlParam = urlParams.get(questionName);
-                    
-                    if (urlParam) {
-                        answers[questionName] = urlParam;
-                        
-                        // 在表单中选中对应的选项
-                        const radio = document.querySelector(`input[name="${questionName}"][value="${urlParam}"]`);
-                        if (radio) {
-                            radio.checked = true;
-                            radio.closest('.option').classList.add('selected');
-                        }
+            function showResults(answerStr) {
+                // 如果传入的是加密字符串，先解密
+                if (answerStr.length === 5 && answerStr.match(/^[a-d]+$/)) {
+                    // 已经是解密后的答案字符串
+                } else {
+                    // 尝试解密
+                    answerStr = decrypt(answerStr);
+                }
+                
+                // 确保答案字符串有效
+                if (!answerStr || answerStr.length !== 5 || !answerStr.match(/^[a-d]+$/)) {
+                    console.error('无效的答案字符串:', answerStr);
+                    return;
+                }
+                
+                // 在表单中选中对应的选项
+                for (let i = 0; i < 5; i++) {
+                    const questionName = 'q' + (i + 1);
+                    const value = answerStr[i];
+                    const radio = document.querySelector(`input[name="${questionName}"][value="${value}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                        radio.closest('.option').classList.add('selected');
                     }
                 }
                 
                 // 计算得分和生成报告
-                const score = calculateScore(answers);
-                const report = generateReport(score, answers);
+                const score = calculateScore(answerStr);
+                const report = generateReport(score, answerStr);
                 
                 // 更新结果页面
                 scoreDisplay.textContent = `你的个性得分: ${score}/25`;
@@ -426,37 +473,33 @@
             }
             
             // 计算得分函数
-            function calculateScore(answers) {
+            function calculateScore(answerStr) {
                 let score = 0;
                 
                 // 为每个答案分配分数
                 const scoring = {
-                    q1: { a: 4, b: 3, c: 5, d: 2 },
-                    q2: { a: 5, b: 4, c: 3, d: 2 },
-                    q3: { a: 5, b: 4, c: 3, d: 2 },
-                    q4: { a: 4, b: 5, c: 3, d: 2 },
-                    q5: { a: 5, b: 4, c: 3, d: 2 }
+                    'a': 5,
+                    'b': 4,
+                    'c': 3,
+                    'd': 2
                 };
                 
-                for (let i = 1; i <= 5; i++) {
-                    const questionName = 'q' + i;
-                    if (answers[questionName]) {
-                        score += scoring[questionName][answers[questionName]];
-                    }
+                for (let i = 0; i < answerStr.length; i++) {
+                    score += scoring[answerStr[i]];
                 }
                 
                 return score;
             }
             
             // 生成报告函数
-            function generateReport(score, answers) {
+            function generateReport(score, answerStr) {
                 let description = '';
                 let traits = '<h3>你的主要个性特征：</h3><ul>';
                 
-                if (score >= 20) {
+                if (score >= 22) {
                     description = '你是一个积极乐观、适应力强的人。你善于面对挑战，在社交场合中游刃有余，对未来充满信心。你的决策通常基于理性分析和内心直觉的平衡。';
                     traits += '<li>积极乐观</li><li>适应力强</li><li>善于社交</li><li>决策平衡</li>';
-                } else if (score >= 15) {
+                } else if (score >= 18) {
                     description = '你是一个谨慎而稳重的人。你在社交和独处之间找到了良好的平衡，对未来既有期待也有适当的担忧。你的决策过程较为全面，会考虑多方因素。';
                     traits += '<li>谨慎稳重</li><li>平衡社交</li><li>全面思考</li><li>适度担忧</li>';
                 } else {
@@ -467,15 +510,15 @@
                 traits += '</ul>';
                 
                 // 根据具体答案添加个性化描述
-                if (answers.q1 === 'c') {
+                if (answerStr[0] === 'c') {
                     traits += '<p>你擅长通过积极的方式（如运动或爱好）来应对压力，这是一种健康的压力管理策略。</p>';
                 }
                 
-                if (answers.q2 === 'a') {
+                if (answerStr[1] === 'a') {
                     traits += '<p>你在社交场合中如鱼得水，具备良好的社交能力和领导潜力。</p>';
                 }
                 
-                if (answers.q4 === 'a') {
+                if (answerStr[3] === 'a') {
                     traits += '<p>你的决策方式偏向理性分析，这使你在复杂情况下能做出较为客观的判断。</p>';
                 }
                 
