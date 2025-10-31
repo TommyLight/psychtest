@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>90题心理测验 - 探索你的内心世界</title>
+    <title>SCL-90症状自评量表测试</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -79,9 +79,8 @@
         .options {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 30px;
-            /* 确保选项容器高度稳定 */
             align-items: stretch;
         }
         
@@ -94,15 +93,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
-            /* 关键修复：预置透明边框，保持布局稳定 */
             border-left: 4px solid transparent;
-            /* 设置固定高度防止抖动 */
-            min-height: 60px;
+            min-height: 70px;
         }
         
         .option:hover {
             background-color: #e6e9f0;
-            transform: translateY(-2px);
         }
         
         .option.selected {
@@ -200,6 +196,26 @@
             margin-bottom: 20px;
         }
         
+        .factor-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .factor-table th, .factor-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .factor-table th {
+            background-color: #f2f2f2;
+        }
+        
+        .positive-factor {
+            background-color: #ffe6e6;
+        }
+        
         .share-link {
             background-color: #f0f4ff;
             padding: 15px;
@@ -246,7 +262,7 @@
             }
             
             .option {
-                min-height: 70px;
+                min-height: 80px;
             }
         }
     </style>
@@ -254,8 +270,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>90题心理测验</h1>
-            <p class="subtitle">深度探索你的性格特质、情绪模式和人际关系</p>
+            <h1>SCL-90症状自评量表测试</h1>
+            <p class="subtitle">根据最近一周的实际感受，评估您的心理健康状况</p>
         </header>
         
         <div class="content" id="quiz-container">
@@ -275,12 +291,12 @@
         </div>
         
         <div class="result" id="result-container">
-            <h2>你的个性分析报告</h2>
+            <h2>SCL-90测试结果分析</h2>
             
             <div class="result-content">
                 <div class="result-score" id="score-display"></div>
                 <div class="result-description" id="result-description"></div>
-                <div id="personality-traits"></div>
+                <div id="factor-analysis"></div>
             </div>
             
             <div class="share-link">
@@ -292,7 +308,7 @@
         </div>
         
         <div class="footer">
-            <p>本测验结果仅供参考，不代表专业心理评估</p>
+            <p>本测验结果仅供参考，不能替代专业诊断。如有需要，请咨询心理健康专业人士。</p>
         </div>
     </div>
 
@@ -306,7 +322,7 @@
             const retestBtn = document.getElementById('retest-btn');
             const scoreDisplay = document.getElementById('score-display');
             const resultDescription = document.getElementById('result-description');
-            const personalityTraits = document.getElementById('personality-traits');
+            const factorAnalysis = document.getElementById('factor-analysis');
             const shareUrl = document.getElementById('share-url');
             const progressCount = document.getElementById('progress-count');
             const progressBar = document.getElementById('progress-bar');
@@ -317,8 +333,122 @@
             // 用户答案数组
             let userAnswers = Array(90).fill(null);
             
-            // 生成90道题目
-            const questions = generateQuestions();
+            // SCL-90题目
+            const questions = [
+                "头痛",
+                "神经过敏，心中不踏实",
+                "头脑中有不必要的想法或字句盘旋",
+                "头晕或晕倒",
+                "对异性的兴趣减退",
+                "对旁人责备求全",
+                "感到别人能控制你的思想",
+                "责怪别人制造麻烦",
+                "忘记性大",
+                "担心自己的衣饰整齐及仪态的端正",
+                "容易烦恼和激动",
+                "胸痛",
+                "害怕空旷的场所或街道",
+                "感到自己的精力下降，活动减慢",
+                "想结束自己的生命",
+                "听到旁人听不到的声音",
+                "发抖",
+                "感到大多数人都不可信任",
+                "胃口不好",
+                "容易哭泣",
+                "同异性相处时感到害羞不自在",
+                "感到受骗，中了圈套或有人想抓住你",
+                "无缘无故地突然感到害怕",
+                "自己不能控制地大发脾气",
+                "怕单独出门",
+                "经常责怪自己",
+                "腰痛",
+                "感到难以完成任务",
+                "感到孤独",
+                "感到苦闷",
+                "过分担忧",
+                "对事物不感兴趣",
+                "感到害怕",
+                "你的感情容易受到伤害",
+                "旁人能知道你的私下想法",
+                "感到别人不理解你、不同情你",
+                "感到人们对你不友好，不喜欢你",
+                "做事必须做得很慢以保证做得正确",
+                "心跳得很厉害",
+                "恶心或胃部不舒服",
+                "感到比不上他人",
+                "肌肉酸痛",
+                "感到有人在监视你、谈论你",
+                "难以入睡",
+                "做事必须反复检查",
+                "难以做出决定",
+                "怕乘电车、公共汽车、地铁或火车",
+                "呼吸有困难",
+                "一阵阵发冷或发热",
+                "因为感到害怕而避开某些东西、场合或活动",
+                "脑子变空了",
+                "身体发麻或刺痛",
+                "喉咙有梗塞感",
+                "感到前途没有希望",
+                "不能集中注意力",
+                "感到身体的某一部分软弱无力",
+                "感到紧张或容易紧张",
+                "感到手或脚发重",
+                "想到死亡的事",
+                "吃得太多",
+                "当别人看着你或谈论你时，感到不自在",
+                "有一些不属于你自己的想法",
+                "有想打人或伤害他人的冲动",
+                "醒得太早",
+                "必须反复洗手、点数目或触摸某些东西",
+                "睡得不稳不深",
+                "有想摔坏或破坏东西的冲动",
+                "有一些别人没有的想法或念头",
+                "感到对别人神经过敏",
+                "在商店或电影院等人多的地方感到不自在",
+                "感到任何事情都很难做",
+                "一阵阵恐惧或惊恐",
+                "感到在公共场合吃东西很不舒服",
+                "经常与人争论",
+                "单独一人时神经很紧张",
+                "别人对你的成绩没有做出恰当的评价",
+                "即使和别人在一起也感到孤单",
+                "感到坐立不安、心神不定",
+                "感到自己没有什么价值",
+                "感到熟悉的东西变成陌生或不像是真的",
+                "大叫或摔东西",
+                "害怕会在公共场合晕倒",
+                "感到别人想占你的便宜",
+                "为一些有关\"性\"的想法而很苦恼",
+                "你认为应该因为自己的过错而受到惩罚",
+                "感到要很快把事情做完",
+                "感到自己的身体有严重问题",
+                "从未感到和其他人很亲近",
+                "感到自己有罪",
+                "感到自己的脑子有毛病"
+            ];
+            
+            // 选项和对应的分值
+            const options = [
+                { text: "A. 从无", value: "a", score: 1 },
+                { text: "B. 很轻", value: "b", score: 2 },
+                { text: "C. 中等", value: "c", score: 3 },
+                { text: "D. 偏重", value: "d", score: 4 },
+                { text: "E. 严重", value: "e", score: 5 }
+            ];
+            
+            // SCL-90因子分类
+            const factors = {
+                "躯体化": [0, 3, 11, 26, 39, 41, 47, 48, 51, 52, 55, 57], // 题目1,4,12,27,40,42,48,49,52,53,56,58
+                "强迫症状": [2, 8, 9, 27, 37, 44, 45, 50, 54, 64], // 题目3,9,10,28,38,45,46,51,55,65
+                "人际关系敏感": [5, 20, 33, 35, 36, 40, 60, 68, 72], // 题目6,21,34,36,37,41,61,69,73
+                "抑郁": [4, 13, 14, 19, 21, 25, 28, 29, 30, 31, 53, 70, 78], // 题目5,14,15,20,22,26,29,30,31,32,54,71,79
+                "焦虑": [1, 16, 22, 32, 38, 56, 71, 77, 79, 85], // 题目2,17,23,33,39,57,72,78,80,86
+                "敌对": [10, 23, 62, 66, 73, 80], // 题目11,24,63,67,74,81
+                "恐怖": [12, 24, 46, 49, 69, 74, 81], // 题目13,25,47,50,70,75,82
+                "偏执": [7, 17, 42, 67, 75, 82], // 题目8,18,43,68,76,83
+                "精神病性": [6, 15, 34, 61, 76, 83, 84, 86, 87, 89], // 题目7,16,35,62,77,84,85,87,88,90
+                "其他": [18, 43, 58, 59, 63, 65, 88] // 题目19,44,59,60,64,66,89
+            };
             
             // Base64编码函数（URL安全）
             function encodeAnswers(answerStr) {
@@ -366,91 +496,25 @@
                 document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
             }
             
-            // 生成90道题目数据
-            function generateQuestions() {
-                const questionTemplates = [
-                    "我通常感到 {option}",
-                    "在社交场合中，我 {option}",
-                    "当面对压力时，我 {option}",
-                    "对于新环境，我 {option}",
-                    "在做决定时，我 {option}",
-                    "我对待工作的态度是 {option}",
-                    "在人际关系中，我 {option}",
-                    "关于未来，我 {option}",
-                    "面对批评，我 {option}",
-                    "我通常的情绪状态是 {option}",
-                    "在团队中，我 {option}",
-                    "我处理冲突的方式是 {option}",
-                    "对于规则和制度，我 {option}",
-                    "在空闲时间，我 {option}",
-                    "我对待金钱的态度是 {option}",
-                    "面对挑战，我 {option}",
-                    "我学习新知识的方式是 {option}",
-                    "在表达自己时，我 {option}",
-                    "我对待健康的态度是 {option}",
-                    "对于艺术和美感，我 {option}"
-                ];
-                
-                const optionSets = [
-                    ["非常积极", "比较积极", "中性", "比较消极"],
-                    ["主动与人交流", "等待别人接近", "根据情况而定", "尽量避免交流"],
-                    ["冷静分析问题", "寻求他人帮助", "感到焦虑不安", "暂时逃避问题"],
-                    ["感到兴奋好奇", "谨慎观察", "有些紧张", "希望保持原状"],
-                    ["理性分析利弊", "听从直觉", "征求他人意见", "犹豫不决"],
-                    ["追求完美", "尽力而为", "完成任务即可", "能拖则拖"],
-                    ["容易建立亲密关系", "需要时间建立信任", "保持一定距离", "避免深入交往"],
-                    ["充满期待", "有些担忧", "顺其自然", "感到焦虑"],
-                    ["认真反思", "感到受伤", "辩解反驳", "忽视不理"],
-                    ["快乐满足", "平静稳定", "有些低落", "焦虑不安"],
-                    ["喜欢领导", "积极参与", "跟随他人", "避免参与"],
-                    ["直接面对", "寻求妥协", "回避冲突", "情绪爆发"],
-                    ["严格遵守", "灵活运用", "有时打破", "经常无视"],
-                    ["计划安排", "随心所欲", "被动接受", "无所事事"],
-                    ["精打细算", "适度消费", "偶尔挥霍", "经常超支"],
-                    ["积极面对", "谨慎尝试", "有些退缩", "直接放弃"],
-                    ["系统学习", "实践探索", "需要指导", "缺乏动力"],
-                    ["直言不讳", "委婉表达", "有所保留", "很少表达"],
-                    ["非常重视", "比较注意", "偶尔关注", "很少关心"],
-                    ["非常敏感", "比较欣赏", "一般感受", "不太在意"]
-                ];
-                
-                let questions = [];
-                for (let i = 1; i <= 90; i++) {
-                    const templateIndex = (i - 1) % questionTemplates.length;
-                    const optionIndex = (i - 1) % optionSets.length;
-                    
-                    const questionText = questionTemplates[templateIndex].replace('{option}', '');
-                    const options = optionSets[optionIndex];
-                    
-                    questions.push({
-                        id: i,
-                        text: questionText,
-                        options: options
-                    });
-                }
-                
-                return questions;
-            }
-            
             // 显示当前题目
             function showCurrentQuestion() {
                 const question = questions[currentQuestionIndex];
                 
                 let questionHTML = `
                     <div class="question">
-                        <h3>${question.id}. ${question.text}</h3>
+                        <h3>${currentQuestionIndex + 1}. ${question}</h3>
+                        <p>请根据最近一周的实际感受选择：</p>
                     </div>
                     <div class="options">
                 `;
                 
-                question.options.forEach((option, index) => {
-                    const optionLetter = ['a', 'b', 'c', 'd'][index];
-                    const isSelected = userAnswers[currentQuestionIndex] === optionLetter;
+                options.forEach((option, index) => {
+                    const isSelected = userAnswers[currentQuestionIndex] === option.value;
                     
                     questionHTML += `
                         <label class="option ${isSelected ? 'selected' : ''}">
-                            <input type="radio" name="current-question" value="${optionLetter}" ${isSelected ? 'checked' : ''}>
-                            ${option}
+                            <input type="radio" name="current-question" value="${option.value}" ${isSelected ? 'checked' : ''}>
+                            ${option.text}
                         </label>
                     `;
                 });
@@ -533,7 +597,7 @@
                     if (answers.length === 90) {
                         userAnswers = answers.split('');
                         // 保存到Cookie
-                        setCookie('psychTestAnswers', encodedAnswers, 30);
+                        setCookie('scl90TestAnswers', encodedAnswers, 30);
                         showResults();
                     }
                 } catch (e) {
@@ -541,7 +605,7 @@
                 }
             } else {
                 // 检查Cookie
-                const cookieAnswers = getCookie('psychTestAnswers');
+                const cookieAnswers = getCookie('scl90TestAnswers');
                 if (cookieAnswers) {
                     try {
                         const answers = decodeAnswers(cookieAnswers);
@@ -562,7 +626,7 @@
             retestBtn.addEventListener('click', function() {
                 // 清除URL参数和Cookie
                 window.history.replaceState({}, '', window.location.pathname);
-                deleteCookie('psychTestAnswers');
+                deleteCookie('scl90TestAnswers');
                 
                 // 重置数据
                 currentQuestionIndex = 0;
@@ -579,13 +643,12 @@
             // 显示结果函数
             function showResults() {
                 // 计算得分和生成报告
-                const score = calculateScore();
-                const report = generateReport(score);
+                const report = generateReport();
                 
                 // 更新结果页面
-                scoreDisplay.textContent = `你的心理特质得分: ${score}/360`;
+                scoreDisplay.textContent = `总分: ${report.totalScore} | 阳性项目数: ${report.positiveItems} | 阴性项目数: ${report.negativeItems}`;
                 resultDescription.textContent = report.description;
-                personalityTraits.innerHTML = report.traits;
+                factorAnalysis.innerHTML = report.factorAnalysis;
                 
                 // 加密答案并生成分享链接
                 const answerStr = userAnswers.join('');
@@ -594,7 +657,7 @@
                 window.history.replaceState({}, '', newUrl);
                 
                 // 保存到Cookie
-                setCookie('psychTestAnswers', encodedAnswers, 30);
+                setCookie('scl90TestAnswers', encodedAnswers, 30);
                 
                 // 设置分享链接
                 shareUrl.href = newUrl;
@@ -605,87 +668,84 @@
                 resultContainer.style.display = 'block';
             }
             
-            // 计算得分函数
-            function calculateScore() {
-                let score = 0;
-                
-                // 为每个答案分配分数
-                const scoring = {
-                    'a': 4,
-                    'b': 3,
-                    'c': 2,
-                    'd': 1
-                };
-                
-                for (let i = 0; i < userAnswers.length; i++) {
-                    score += scoring[userAnswers[i]];
-                }
-                
-                return score;
-            }
-            
             // 生成报告函数
-            function generateReport(score) {
+            function generateReport() {
+                // 计算总分
+                let totalScore = 0;
+                const scores = userAnswers.map(answer => {
+                    const option = options.find(opt => opt.value === answer);
+                    return option ? option.score : 0;
+                });
+                
+                totalScore = scores.reduce((sum, score) => sum + score, 0);
+                
+                // 计算阳性项目数和阴性项目数
+                const positiveItems = scores.filter(score => score >= 2).length;
+                const negativeItems = 90 - positiveItems;
+                
+                // 计算因子分
+                const factorScores = {};
+                for (const [factorName, questionIndices] of Object.entries(factors)) {
+                    const factorTotal = questionIndices.reduce((sum, index) => sum + scores[index], 0);
+                    const factorAverage = factorTotal / questionIndices.length;
+                    factorScores[factorName] = {
+                        total: factorTotal,
+                        average: factorAverage,
+                        isPositive: factorAverage > 2
+                    };
+                }
+                
+                // 判断筛查结果
+                const isTotalScorePositive = totalScore > 160;
+                const isPositiveItemsExceeded = positiveItems > 43;
+                const hasPositiveFactors = Object.values(factorScores).some(factor => factor.isPositive);
+                
                 let description = '';
-                let traits = '<h3>你的主要心理特质：</h3><ul>';
-                
-                // 分析不同维度的得分
-                const dimensionScores = {
-                    '外向性': 0,
-                    '情绪稳定性': 0,
-                    '开放性': 0,
-                    '宜人性': 0,
-                    '尽责性': 0
-                };
-                
-                // 假设每18题对应一个维度
-                for (let i = 0; i < 90; i++) {
-                    const dimensionIndex = Math.floor(i / 18);
-                    const dimensionNames = ['外向性', '情绪稳定性', '开放性', '宜人性', '尽责性'];
-                    const dimension = dimensionNames[dimensionIndex];
-                    
-                    const answerValue = userAnswers[i];
-                    const answerScore = {'a': 4, 'b': 3, 'c': 2, 'd': 1}[answerValue];
-                    
-                    dimensionScores[dimension] += answerScore;
-                }
-                
-                // 生成描述
-                if (score >= 300) {
-                    description = '你是一个心理特质非常积极的人。你在各个维度上都表现出较高的水平，拥有良好的心理适应能力和积极的生活态度。';
-                } else if (score >= 240) {
-                    description = '你的心理特质总体较为积极。你在多个维度上表现良好，拥有较好的心理适应能力，但在某些方面还有提升空间。';
-                } else if (score >= 180) {
-                    description = '你的心理特质处于中等水平。你在某些方面表现良好，但在其他方面可能需要更多的关注和发展。';
+                if (isTotalScorePositive || isPositiveItemsExceeded || hasPositiveFactors) {
+                    description = '根据中国常模标准，您的测试结果显示可能存在心理困扰。建议您关注心理健康，必要时寻求专业心理咨询或精神科医生的评估。';
                 } else {
-                    description = '你的心理特质在某些方面可能需要更多关注。建议你在日常生活中多关注自己的心理健康，必要时可以寻求专业帮助。';
+                    description = '根据中国常模标准，您的测试结果在正常范围内。但请注意，这只是一个筛查工具，不能完全代表您的心理健康状况。';
                 }
                 
-                // 添加维度分析
-                traits += `<li><strong>外向性得分：${dimensionScores['外向性']}/72</strong> - 这反映了你在社交活动中的活跃程度和能量水平</li>`;
-                traits += `<li><strong>情绪稳定性得分：${dimensionScores['情绪稳定性']}/72</strong> - 这反映了你情绪反应的强度和应对压力的能力</li>`;
-                traits += `<li><strong>开放性得分：${dimensionScores['开放性']}/72</strong> - 这反映了你对新经验、新想法和变化的接受程度</li>`;
-                traits += `<li><strong>宜人性得分：${dimensionScores['宜人性']}/72</strong> - 这反映了你在人际关系中的合作性、同情心和信任度</li>`;
-                traits += `<li><strong>尽责性得分：${dimensionScores['尽责性']}/72</strong> - 这反映了你的组织性、责任感和自律性</li>`;
+                // 生成因子分析表格
+                let factorAnalysisHTML = '<h3>因子分分析</h3>';
+                factorAnalysisHTML += '<table class="factor-table">';
+                factorAnalysisHTML += '<tr><th>因子</th><th>项目数</th><th>因子均分</th><th>结果</th></tr>';
                 
-                traits += '</ul>';
-                
-                // 根据最高分的维度给出建议
-                let maxDimension = '';
-                let maxScore = 0;
-                for (const [dimension, score] of Object.entries(dimensionScores)) {
-                    if (score > maxScore) {
-                        maxScore = score;
-                        maxDimension = dimension;
-                    }
+                for (const [factorName, data] of Object.entries(factorScores)) {
+                    const rowClass = data.isPositive ? 'positive-factor' : '';
+                    const resultText = data.isPositive ? '阳性(>2)' : '正常';
+                    
+                    factorAnalysisHTML += `
+                        <tr class="${rowClass}">
+                            <td>${factorName}</td>
+                            <td>${factors[factorName].length}</td>
+                            <td>${data.average.toFixed(2)}</td>
+                            <td>${resultText}</td>
+                        </tr>
+                    `;
                 }
                 
-                traits += `<h3>你的最强特质：${maxDimension}</h3>`;
-                traits += `<p>根据测试结果，你在${maxDimension}方面表现最为突出。这可能是你性格中的核心优势，可以在生活和工作中善加利用。</p>`;
+                factorAnalysisHTML += '</table>';
+                
+                // 添加筛查标准说明
+                factorAnalysisHTML += `
+                    <div style="margin-top: 20px;">
+                        <h4>筛查阳性标准（中国常模）：</h4>
+                        <ul>
+                            <li>总分 > 160分: ${isTotalScorePositive ? '阳性' : '正常'}</li>
+                            <li>阳性项目数 > 43项: ${isPositiveItemsExceeded ? '阳性' : '正常'}</li>
+                            <li>任一因子分 > 2分: ${hasPositiveFactors ? '阳性' : '正常'}</li>
+                        </ul>
+                    </div>
+                `;
                 
                 return {
+                    totalScore: totalScore,
+                    positiveItems: positiveItems,
+                    negativeItems: negativeItems,
                     description: description,
-                    traits: traits
+                    factorAnalysis: factorAnalysisHTML
                 };
             }
             
