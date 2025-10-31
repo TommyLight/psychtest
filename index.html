@@ -92,6 +92,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
+            /* 关键修复：预置透明边框，保持布局稳定 */
+            border-left: 4px solid transparent;
         }
         
         .option:hover {
@@ -101,7 +103,7 @@
         
         .option.selected {
             background-color: #e1e8f7;
-            border-left: 4px solid var(--primary-color);
+            border-left-color: var(--primary-color);
         }
         
         .option input {
@@ -304,36 +306,24 @@
             // 生成90道题目
             const questions = generateQuestions();
             
-            // 简单映射加密函数
-            function encrypt(text) {
-                const mapping = {
-                    'a': 'z',
-                    'b': 'w',
-                    'c': 'a',
-                    'd': '0'
-                };
-                
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    result += mapping[text[i]];
-                }
-                return result;
+            // Base64编码函数（URL安全）
+            function encodeAnswers(answerStr) {
+                // 将字符串转换为Base64
+                let base64 = btoa(answerStr);
+                // 转换为URL安全格式
+                return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             }
             
-            // 简单映射解密函数
-            function decrypt(text) {
-                const reverseMapping = {
-                    'z': 'a',
-                    'w': 'b',
-                    'a': 'c',
-                    '0': 'd'
-                };
-                
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    result += reverseMapping[text[i]];
+            // Base64解码函数（URL安全）
+            function decodeAnswers(encodedStr) {
+                // 恢复标准Base64格式
+                let base64 = encodedStr.replace(/-/g, '+').replace(/_/g, '/');
+                // 添加填充字符（如果需要）
+                while (base64.length % 4) {
+                    base64 += '=';
                 }
-                return result;
+                // 解码Base64
+                return atob(base64);
             }
             
             // 生成90道题目数据
@@ -497,7 +487,7 @@
             const encodedAnswers = urlParams.get('r');
             if (encodedAnswers) {
                 try {
-                    const answers = decrypt(encodedAnswers);
+                    const answers = decodeAnswers(encodedAnswers);
                     if (answers.length === 90) {
                         userAnswers = answers.split('');
                         showResults();
@@ -537,7 +527,7 @@
                 
                 // 加密答案并生成分享链接
                 const answerStr = userAnswers.join('');
-                const encodedAnswers = encrypt(answerStr);
+                const encodedAnswers = encodeAnswers(answerStr);
                 const newUrl = window.location.origin + window.location.pathname + '?r=' + encodedAnswers;
                 window.history.replaceState({}, '', newUrl);
                 
