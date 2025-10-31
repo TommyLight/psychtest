@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个性心理测验</title>
+    <title>90题心理测验 - 探索你的内心世界</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -23,12 +23,11 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            padding: 20px;
             color: var(--dark-color);
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background-color: white;
             border-radius: 15px;
@@ -55,39 +54,41 @@
         
         .content {
             padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
         }
         
         .question {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
             border-bottom: 1px solid #eee;
         }
         
         .question h3 {
             margin-bottom: 15px;
             color: var(--primary-color);
-            font-size: 1.3rem;
+            font-size: 1.1rem;
+            line-height: 1.4;
         }
         
         .options {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         
         .option {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
+            padding: 10px 12px;
             background-color: var(--light-color);
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
         .option:hover {
             background-color: #e6e9f0;
-            transform: translateY(-2px);
         }
         
         .option.selected {
@@ -96,7 +97,7 @@
         }
         
         .option input {
-            margin-right: 10px;
+            margin-right: 8px;
         }
         
         .btn {
@@ -117,6 +118,28 @@
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-container {
+            margin-bottom: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--dark-color);
         }
         
         .result {
@@ -186,99 +209,18 @@
 <body>
     <div class="container">
         <header>
-            <h1>个性心理测验</h1>
-            <p class="subtitle">探索你的内心世界，发现真实的自己</p>
+            <h1>90题心理测验</h1>
+            <p class="subtitle">深度探索你的性格特质、情绪模式和人际关系</p>
         </header>
         
         <div class="content" id="quiz-container">
-            <div class="question">
-                <h3>1. 当你遇到压力时，你通常会：</h3>
-                <div class="options">
-                    <label class="option">
-                        <input type="radio" name="q1" value="a"> 独自思考并寻找解决方案
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q1" value="b"> 寻求朋友或家人的帮助
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q1" value="c"> 通过运动或爱好来释放压力
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q1" value="d"> 暂时逃避，希望问题自行解决
-                    </label>
-                </div>
+            <div class="progress-text">已完成: <span id="progress-count">0</span>/90 题</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
             </div>
             
-            <div class="question">
-                <h3>2. 在社交场合中，你通常是：</h3>
-                <div class="options">
-                    <label class="option">
-                        <input type="radio" name="q2" value="a"> 活跃的焦点，善于带动气氛
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q2" value="b"> 安静的观察者，选择性参与
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q2" value="c"> 介于两者之间，视情况而定
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q2" value="d"> 感到不适，尽量提前离开
-                    </label>
-                </div>
-            </div>
-            
-            <div class="question">
-                <h3>3. 关于未来，你的态度是：</h3>
-                <div class="options">
-                    <label class="option">
-                        <input type="radio" name="q3" value="a"> 充满期待，积极规划
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q3" value="b"> 有些担忧，但尽量保持乐观
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q3" value="c"> 顺其自然，不刻意规划
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q3" value="d"> 感到焦虑，不确定未来会怎样
-                    </label>
-                </div>
-            </div>
-            
-            <div class="question">
-                <h3>4. 当你做决定时，你更倾向于：</h3>
-                <div class="options">
-                    <label class="option">
-                        <input type="radio" name="q4" value="a"> 理性分析利弊，做出最优选择
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q4" value="b"> 听从内心的感觉和直觉
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q4" value="c"> 征求他人意见，再做决定
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q4" value="d"> 犹豫不决，害怕做出错误选择
-                    </label>
-                </div>
-            </div>
-            
-            <div class="question">
-                <h3>5. 对于新环境或新挑战，你的第一反应是：</h3>
-                <div class="options">
-                    <label class="option">
-                        <input type="radio" name="q5" value="a"> 兴奋和期待，跃跃欲试
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q5" value="b"> 谨慎评估风险和可能性
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q5" value="c"> 感到紧张，但会努力适应
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q5" value="d"> 抗拒变化，希望保持现状
-                    </label>
-                </div>
+            <div id="questions-container">
+                <!-- 问题将通过JavaScript动态生成 -->
             </div>
             
             <button class="btn" id="submit-btn">查看我的测试结果</button>
@@ -316,6 +258,89 @@
             const resultDescription = document.getElementById('result-description');
             const personalityTraits = document.getElementById('personality-traits');
             const shareUrl = document.getElementById('share-url');
+            const questionsContainer = document.getElementById('questions-container');
+            const progressCount = document.getElementById('progress-count');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // 生成90道题目
+            function generateQuestions() {
+                const questionTemplates = [
+                    "我通常感到 {option}",
+                    "在社交场合中，我 {option}",
+                    "当面对压力时，我 {option}",
+                    "对于新环境，我 {option}",
+                    "在做决定时，我 {option}",
+                    "我对待工作的态度是 {option}",
+                    "在人际关系中，我 {option}",
+                    "关于未来，我 {option}",
+                    "面对批评，我 {option}",
+                    "我通常的情绪状态是 {option}",
+                    "在团队中，我 {option}",
+                    "我处理冲突的方式是 {option}",
+                    "对于规则和制度，我 {option}",
+                    "在空闲时间，我 {option}",
+                    "我对待金钱的态度是 {option}",
+                    "面对挑战，我 {option}",
+                    "我学习新知识的方式是 {option}",
+                    "在表达自己时，我 {option}",
+                    "我对待健康的态度是 {option}",
+                    "对于艺术和美感，我 {option}"
+                ];
+                
+                const optionSets = [
+                    ["非常积极", "比较积极", "中性", "比较消极"],
+                    ["主动与人交流", "等待别人接近", "根据情况而定", "尽量避免交流"],
+                    ["冷静分析问题", "寻求他人帮助", "感到焦虑不安", "暂时逃避问题"],
+                    ["感到兴奋好奇", "谨慎观察", "有些紧张", "希望保持原状"],
+                    ["理性分析利弊", "听从直觉", "征求他人意见", "犹豫不决"],
+                    ["追求完美", "尽力而为", "完成任务即可", "能拖则拖"],
+                    ["容易建立亲密关系", "需要时间建立信任", "保持一定距离", "避免深入交往"],
+                    ["充满期待", "有些担忧", "顺其自然", "感到焦虑"],
+                    ["认真反思", "感到受伤", "辩解反驳", "忽视不理"],
+                    ["快乐满足", "平静稳定", "有些低落", "焦虑不安"],
+                    ["喜欢领导", "积极参与", "跟随他人", "避免参与"],
+                    ["直接面对", "寻求妥协", "回避冲突", "情绪爆发"],
+                    ["严格遵守", "灵活运用", "有时打破", "经常无视"],
+                    ["计划安排", "随心所欲", "被动接受", "无所事事"],
+                    ["精打细算", "适度消费", "偶尔挥霍", "经常超支"],
+                    ["积极面对", "谨慎尝试", "有些退缩", "直接放弃"],
+                    ["系统学习", "实践探索", "需要指导", "缺乏动力"],
+                    ["直言不讳", "委婉表达", "有所保留", "很少表达"],
+                    ["非常重视", "比较注意", "偶尔关注", "很少关心"],
+                    ["非常敏感", "比较欣赏", "一般感受", "不太在意"]
+                ];
+                
+                let questionsHTML = '';
+                for (let i = 1; i <= 90; i++) {
+                    const templateIndex = (i - 1) % questionTemplates.length;
+                    const optionIndex = (i - 1) % optionSets.length;
+                    
+                    const questionText = questionTemplates[templateIndex].replace('{option}', '');
+                    const options = optionSets[optionIndex];
+                    
+                    questionsHTML += `
+                        <div class="question" id="q${i}">
+                            <h3>${i}. ${questionText}</h3>
+                            <div class="options">
+                                <label class="option">
+                                    <input type="radio" name="q${i}" value="a"> ${options[0]}
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q${i}" value="b"> ${options[1]}
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q${i}" value="c"> ${options[2]}
+                                </label>
+                                <label class="option">
+                                    <input type="radio" name="q${i}" value="d"> ${options[3]}
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                questionsContainer.innerHTML = questionsHTML;
+            }
             
             // 简单映射加密函数
             function encrypt(text) {
@@ -349,22 +374,35 @@
                 return result;
             }
             
+            // 更新进度条
+            function updateProgress() {
+                const answeredCount = document.querySelectorAll('input[type="radio"]:checked').length;
+                const progress = (answeredCount / 90) * 100;
+                progressBar.style.width = `${progress}%`;
+                progressCount.textContent = answeredCount;
+            }
+            
             // 为选项添加点击效果
-            document.querySelectorAll('.option').forEach(option => {
-                option.addEventListener('click', function() {
-                    const radio = this.querySelector('input[type="radio"]');
-                    radio.checked = true;
-                    
-                    // 移除同一问题中其他选项的选中状态
-                    const question = this.closest('.question');
-                    question.querySelectorAll('.option').forEach(opt => {
-                        opt.classList.remove('selected');
+            function setupOptionListeners() {
+                document.querySelectorAll('.option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        const radio = this.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                        
+                        // 移除同一问题中其他选项的选中状态
+                        const question = this.closest('.question');
+                        question.querySelectorAll('.option').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        
+                        // 添加当前选项的选中状态
+                        this.classList.add('selected');
+                        
+                        // 更新进度
+                        updateProgress();
                     });
-                    
-                    // 添加当前选项的选中状态
-                    this.classList.add('selected');
                 });
-            });
+            }
             
             // 检查URL参数，如果有答案则显示结果
             const urlParams = new URLSearchParams(window.location.search);
@@ -381,7 +419,7 @@
             // 提交按钮事件
             submitBtn.addEventListener('click', function() {
                 // 检查是否所有问题都已回答
-                const allAnswered = document.querySelectorAll('input[type="radio"]:checked').length === 5;
+                const allAnswered = document.querySelectorAll('input[type="radio"]:checked').length === 90;
                 
                 if (!allAnswered) {
                     alert('请回答所有问题后再提交！');
@@ -390,7 +428,7 @@
                 
                 // 收集答案并构建字符串
                 let answerStr = '';
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 90; i++) {
                     const questionName = 'q' + i;
                     const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
                     answerStr += selectedOption.value;
@@ -423,6 +461,9 @@
                     option.classList.remove('selected');
                 });
                 
+                // 重置进度
+                updateProgress();
+                
                 // 显示测验，隐藏结果
                 quizContainer.style.display = 'block';
                 resultContainer.style.display = 'none';
@@ -431,7 +472,7 @@
             // 显示结果函数
             function showResults(answerStr) {
                 // 如果传入的是加密字符串，先解密
-                if (answerStr.length === 5 && answerStr.match(/^[a-d]+$/)) {
+                if (answerStr.length === 90 && answerStr.match(/^[a-d]+$/)) {
                     // 已经是解密后的答案字符串
                 } else {
                     // 尝试解密
@@ -439,13 +480,13 @@
                 }
                 
                 // 确保答案字符串有效
-                if (!answerStr || answerStr.length !== 5 || !answerStr.match(/^[a-d]+$/)) {
+                if (!answerStr || answerStr.length !== 90 || !answerStr.match(/^[a-d]+$/)) {
                     console.error('无效的答案字符串:', answerStr);
                     return;
                 }
                 
                 // 在表单中选中对应的选项
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 90; i++) {
                     const questionName = 'q' + (i + 1);
                     const value = answerStr[i];
                     const radio = document.querySelector(`input[name="${questionName}"][value="${value}"]`);
@@ -460,7 +501,7 @@
                 const report = generateReport(score, answerStr);
                 
                 // 更新结果页面
-                scoreDisplay.textContent = `你的个性得分: ${score}/25`;
+                scoreDisplay.textContent = `你的心理特质得分: ${score}/360`;
                 resultDescription.textContent = report.description;
                 personalityTraits.innerHTML = report.traits;
                 
@@ -478,10 +519,10 @@
                 
                 // 为每个答案分配分数
                 const scoring = {
-                    'a': 5,
-                    'b': 4,
-                    'c': 3,
-                    'd': 2
+                    'a': 4,
+                    'b': 3,
+                    'c': 2,
+                    'd': 1
                 };
                 
                 for (let i = 0; i < answerStr.length; i++) {
@@ -494,39 +535,72 @@
             // 生成报告函数
             function generateReport(score, answerStr) {
                 let description = '';
-                let traits = '<h3>你的主要个性特征：</h3><ul>';
+                let traits = '<h3>你的主要心理特质：</h3><ul>';
                 
-                if (score >= 22) {
-                    description = '你是一个积极乐观、适应力强的人。你善于面对挑战，在社交场合中游刃有余，对未来充满信心。你的决策通常基于理性分析和内心直觉的平衡。';
-                    traits += '<li>积极乐观</li><li>适应力强</li><li>善于社交</li><li>决策平衡</li>';
-                } else if (score >= 18) {
-                    description = '你是一个谨慎而稳重的人。你在社交和独处之间找到了良好的平衡，对未来既有期待也有适当的担忧。你的决策过程较为全面，会考虑多方因素。';
-                    traits += '<li>谨慎稳重</li><li>平衡社交</li><li>全面思考</li><li>适度担忧</li>';
-                } else {
-                    description = '你是一个内向而敏感的人。你更倾向于独处和思考，对新环境和变化需要更多时间适应。你的决策往往基于内心感受，有时可能会犹豫不决。';
-                    traits += '<li>内向敏感</li><li>善于思考</li><li>决策感性</li><li>需要适应期</li>';
+                // 分析不同维度的得分
+                const dimensionScores = {
+                    '外向性': 0,
+                    '情绪稳定性': 0,
+                    '开放性': 0,
+                    '宜人性': 0,
+                    '尽责性': 0
+                };
+                
+                // 假设每18题对应一个维度
+                for (let i = 0; i < 90; i++) {
+                    const dimensionIndex = Math.floor(i / 18);
+                    const dimensionNames = ['外向性', '情绪稳定性', '开放性', '宜人性', '尽责性'];
+                    const dimension = dimensionNames[dimensionIndex];
+                    
+                    const answerValue = answerStr[i];
+                    const answerScore = {'a': 4, 'b': 3, 'c': 2, 'd': 1}[answerValue];
+                    
+                    dimensionScores[dimension] += answerScore;
                 }
+                
+                // 生成描述
+                if (score >= 300) {
+                    description = '你是一个心理特质非常积极的人。你在各个维度上都表现出较高的水平，拥有良好的心理适应能力和积极的生活态度。';
+                } else if (score >= 240) {
+                    description = '你的心理特质总体较为积极。你在多个维度上表现良好，拥有较好的心理适应能力，但在某些方面还有提升空间。';
+                } else if (score >= 180) {
+                    description = '你的心理特质处于中等水平。你在某些方面表现良好，但在其他方面可能需要更多的关注和发展。';
+                } else {
+                    description = '你的心理特质在某些方面可能需要更多关注。建议你在日常生活中多关注自己的心理健康，必要时可以寻求专业帮助。';
+                }
+                
+                // 添加维度分析
+                traits += `<li><strong>外向性得分：${dimensionScores['外向性']}/72</strong> - 这反映了你在社交活动中的活跃程度和能量水平</li>`;
+                traits += `<li><strong>情绪稳定性得分：${dimensionScores['情绪稳定性']}/72</strong> - 这反映了你情绪反应的强度和应对压力的能力</li>`;
+                traits += `<li><strong>开放性得分：${dimensionScores['开放性']}/72</strong> - 这反映了你对新经验、新想法和变化的接受程度</li>`;
+                traits += `<li><strong>宜人性得分：${dimensionScores['宜人性']}/72</strong> - 这反映了你在人际关系中的合作性、同情心和信任度</li>`;
+                traits += `<li><strong>尽责性得分：${dimensionScores['尽责性']}/72</strong> - 这反映了你的组织性、责任感和自律性</li>`;
                 
                 traits += '</ul>';
                 
-                // 根据具体答案添加个性化描述
-                if (answerStr[0] === 'c') {
-                    traits += '<p>你擅长通过积极的方式（如运动或爱好）来应对压力，这是一种健康的压力管理策略。</p>';
+                // 根据最高分的维度给出建议
+                let maxDimension = '';
+                let maxScore = 0;
+                for (const [dimension, score] of Object.entries(dimensionScores)) {
+                    if (score > maxScore) {
+                        maxScore = score;
+                        maxDimension = dimension;
+                    }
                 }
                 
-                if (answerStr[1] === 'a') {
-                    traits += '<p>你在社交场合中如鱼得水，具备良好的社交能力和领导潜力。</p>';
-                }
-                
-                if (answerStr[3] === 'a') {
-                    traits += '<p>你的决策方式偏向理性分析，这使你在复杂情况下能做出较为客观的判断。</p>';
-                }
+                traits += `<h3>你的最强特质：${maxDimension}</h3>`;
+                traits += `<p>根据测试结果，你在${maxDimension}方面表现最为突出。这可能是你性格中的核心优势，可以在生活和工作中善加利用。</p>`;
                 
                 return {
                     description: description,
                     traits: traits
                 };
             }
+            
+            // 初始化测验
+            generateQuestions();
+            setupOptionListeners();
+            updateProgress();
         });
     </script>
 </body>
