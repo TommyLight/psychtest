@@ -24,11 +24,15 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             color: var(--dark-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
             background-color: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -43,52 +47,56 @@
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
         }
         
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             opacity: 0.9;
         }
         
         .content {
             padding: 30px;
-            max-height: 70vh;
-            overflow-y: auto;
+            min-height: 400px;
+        }
+        
+        .question-container {
+            text-align: center;
         }
         
         .question {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 30px;
         }
         
         .question h3 {
             margin-bottom: 15px;
             color: var(--primary-color);
-            font-size: 1.1rem;
-            line-height: 1.4;
+            font-size: 1.4rem;
+            line-height: 1.5;
         }
         
         .options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            margin-bottom: 30px;
         }
         
         .option {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
+            padding: 15px;
             background-color: var(--light-color);
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-align: left;
         }
         
         .option:hover {
             background-color: #e6e9f0;
+            transform: translateY(-2px);
         }
         
         .option.selected {
@@ -97,27 +105,39 @@
         }
         
         .option input {
-            margin-right: 8px;
+            margin-right: 12px;
+            transform: scale(1.2);
         }
         
         .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
+            padding: 12px 25px;
             background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
+            margin: 5px;
         }
         
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
         
         .progress-container {
@@ -197,11 +217,20 @@
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             
             .content {
                 padding: 20px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
             }
         }
     </style>
@@ -219,11 +248,14 @@
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
             
-            <div id="questions-container">
-                <!-- 问题将通过JavaScript动态生成 -->
+            <div class="question-container" id="question-container">
+                <!-- 当前题目将动态显示在这里 -->
             </div>
             
-            <button class="btn" id="submit-btn">查看我的测试结果</button>
+            <div class="btn-container">
+                <button class="btn" id="prev-btn" disabled>上一题</button>
+                <button class="btn" id="next-btn">下一题</button>
+            </div>
         </div>
         
         <div class="result" id="result-container">
@@ -252,17 +284,59 @@
         document.addEventListener('DOMContentLoaded', function() {
             const quizContainer = document.getElementById('quiz-container');
             const resultContainer = document.getElementById('result-container');
-            const submitBtn = document.getElementById('submit-btn');
+            const questionContainer = document.getElementById('question-container');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
             const retestBtn = document.getElementById('retest-btn');
             const scoreDisplay = document.getElementById('score-display');
             const resultDescription = document.getElementById('result-description');
             const personalityTraits = document.getElementById('personality-traits');
             const shareUrl = document.getElementById('share-url');
-            const questionsContainer = document.getElementById('questions-container');
             const progressCount = document.getElementById('progress-count');
             const progressBar = document.getElementById('progress-bar');
             
+            // 当前题目索引
+            let currentQuestionIndex = 0;
+            
+            // 用户答案数组
+            let userAnswers = Array(90).fill(null);
+            
             // 生成90道题目
+            const questions = generateQuestions();
+            
+            // 简单映射加密函数
+            function encrypt(text) {
+                const mapping = {
+                    'a': 'z',
+                    'b': 'w',
+                    'c': 'a',
+                    'd': '0'
+                };
+                
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += mapping[text[i]];
+                }
+                return result;
+            }
+            
+            // 简单映射解密函数
+            function decrypt(text) {
+                const reverseMapping = {
+                    'z': 'a',
+                    'w': 'b',
+                    'a': 'c',
+                    '0': 'd'
+                };
+                
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    result += reverseMapping[text[i]];
+                }
+                return result;
+            }
+            
+            // 生成90道题目数据
             function generateQuestions() {
                 const questionTemplates = [
                     "我通常感到 {option}",
@@ -310,7 +384,7 @@
                     ["非常敏感", "比较欣赏", "一般感受", "不太在意"]
                 ];
                 
-                let questionsHTML = '';
+                let questions = [];
                 for (let i = 1; i <= 90; i++) {
                     const templateIndex = (i - 1) % questionTemplates.length;
                     const optionIndex = (i - 1) % optionSets.length;
@@ -318,85 +392,66 @@
                     const questionText = questionTemplates[templateIndex].replace('{option}', '');
                     const options = optionSets[optionIndex];
                     
-                    questionsHTML += `
-                        <div class="question" id="q${i}">
-                            <h3>${i}. ${questionText}</h3>
-                            <div class="options">
-                                <label class="option">
-                                    <input type="radio" name="q${i}" value="a"> ${options[0]}
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q${i}" value="b"> ${options[1]}
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q${i}" value="c"> ${options[2]}
-                                </label>
-                                <label class="option">
-                                    <input type="radio" name="q${i}" value="d"> ${options[3]}
-                                </label>
-                            </div>
-                        </div>
+                    questions.push({
+                        id: i,
+                        text: questionText,
+                        options: options
+                    });
+                }
+                
+                return questions;
+            }
+            
+            // 显示当前题目
+            function showCurrentQuestion() {
+                const question = questions[currentQuestionIndex];
+                
+                let questionHTML = `
+                    <div class="question">
+                        <h3>${question.id}. ${question.text}</h3>
+                    </div>
+                    <div class="options">
+                `;
+                
+                question.options.forEach((option, index) => {
+                    const optionLetter = ['a', 'b', 'c', 'd'][index];
+                    const isSelected = userAnswers[currentQuestionIndex] === optionLetter;
+                    
+                    questionHTML += `
+                        <label class="option ${isSelected ? 'selected' : ''}">
+                            <input type="radio" name="current-question" value="${optionLetter}" ${isSelected ? 'checked' : ''}>
+                            ${option}
+                        </label>
                     `;
-                }
+                });
                 
-                questionsContainer.innerHTML = questionsHTML;
-            }
-            
-            // 简单映射加密函数
-            function encrypt(text) {
-                const mapping = {
-                    'a': 'z',
-                    'b': 'w',
-                    'c': 'a',
-                    'd': '0'
-                };
+                questionHTML += `</div>`;
                 
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    result += mapping[text[i]];
-                }
-                return result;
-            }
-            
-            // 简单映射解密函数
-            function decrypt(text) {
-                const reverseMapping = {
-                    'z': 'a',
-                    'w': 'b',
-                    'a': 'c',
-                    '0': 'd'
-                };
+                questionContainer.innerHTML = questionHTML;
                 
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    result += reverseMapping[text[i]];
-                }
-                return result;
-            }
-            
-            // 更新进度条
-            function updateProgress() {
-                const answeredCount = document.querySelectorAll('input[type="radio"]:checked').length;
-                const progress = (answeredCount / 90) * 100;
-                progressBar.style.width = `${progress}%`;
-                progressCount.textContent = answeredCount;
-            }
-            
-            // 为选项添加点击效果
-            function setupOptionListeners() {
+                // 更新按钮状态
+                prevBtn.disabled = currentQuestionIndex === 0;
+                nextBtn.textContent = currentQuestionIndex === questions.length - 1 ? '查看结果' : '下一题';
+                
+                // 更新进度
+                updateProgress();
+                
+                // 添加选项点击事件
                 document.querySelectorAll('.option').forEach(option => {
                     option.addEventListener('click', function() {
                         const radio = this.querySelector('input[type="radio"]');
                         radio.checked = true;
                         
                         // 移除同一问题中其他选项的选中状态
-                        const question = this.closest('.question');
-                        question.querySelectorAll('.option').forEach(opt => {
+                        document.querySelectorAll('.option').forEach(opt => {
                             opt.classList.remove('selected');
                         });
                         
                         // 添加当前选项的选中状态
                         this.classList.add('selected');
+                        
+                        // 保存答案
+                        userAnswers[currentQuestionIndex] = radio.value;
                         
                         // 更新进度
                         updateProgress();
@@ -404,109 +459,90 @@
                 });
             }
             
+            // 更新进度条
+            function updateProgress() {
+                const answeredCount = userAnswers.filter(answer => answer !== null).length;
+                const progress = (answeredCount / questions.length) * 100;
+                progressBar.style.width = `${progress}%`;
+                progressCount.textContent = answeredCount;
+            }
+            
+            // 上一题按钮事件
+            prevBtn.addEventListener('click', function() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    showCurrentQuestion();
+                }
+            });
+            
+            // 下一题/查看结果按钮事件
+            nextBtn.addEventListener('click', function() {
+                // 检查当前题目是否已回答
+                if (userAnswers[currentQuestionIndex] === null) {
+                    alert('请选择答案后再继续！');
+                    return;
+                }
+                
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    showCurrentQuestion();
+                } else {
+                    // 到达最后一题，显示结果
+                    showResults();
+                }
+            });
+            
             // 检查URL参数，如果有答案则显示结果
             const urlParams = new URLSearchParams(window.location.search);
             const encodedAnswers = urlParams.get('r');
             if (encodedAnswers) {
                 try {
                     const answers = decrypt(encodedAnswers);
-                    showResults(answers);
+                    if (answers.length === 90) {
+                        userAnswers = answers.split('');
+                        showResults();
+                    }
                 } catch (e) {
                     console.error('解析答案时出错:', e);
                 }
             }
-            
-            // 提交按钮事件
-            submitBtn.addEventListener('click', function() {
-                // 检查是否所有问题都已回答
-                const allAnswered = document.querySelectorAll('input[type="radio"]:checked').length === 90;
-                
-                if (!allAnswered) {
-                    alert('请回答所有问题后再提交！');
-                    return;
-                }
-                
-                // 收集答案并构建字符串
-                let answerStr = '';
-                for (let i = 1; i <= 90; i++) {
-                    const questionName = 'q' + i;
-                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-                    answerStr += selectedOption.value;
-                }
-                
-                // 加密答案
-                const encodedAnswers = encrypt(answerStr);
-                
-                // 构建带参数的URL
-                const newUrl = window.location.origin + window.location.pathname + '?r=' + encodedAnswers;
-                
-                // 更新URL但不刷新页面
-                window.history.replaceState({}, '', newUrl);
-                
-                // 显示结果
-                showResults(answerStr);
-            });
             
             // 重新测试按钮事件
             retestBtn.addEventListener('click', function() {
                 // 清除URL参数
                 window.history.replaceState({}, '', window.location.pathname);
                 
-                // 重置表单
-                document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.checked = false;
-                });
-                
-                document.querySelectorAll('.option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                // 重置进度
-                updateProgress();
+                // 重置数据
+                currentQuestionIndex = 0;
+                userAnswers = Array(90).fill(null);
                 
                 // 显示测验，隐藏结果
                 quizContainer.style.display = 'block';
                 resultContainer.style.display = 'none';
+                
+                // 显示第一题
+                showCurrentQuestion();
             });
             
             // 显示结果函数
-            function showResults(answerStr) {
-                // 如果传入的是加密字符串，先解密
-                if (answerStr.length === 90 && answerStr.match(/^[a-d]+$/)) {
-                    // 已经是解密后的答案字符串
-                } else {
-                    // 尝试解密
-                    answerStr = decrypt(answerStr);
-                }
-                
-                // 确保答案字符串有效
-                if (!answerStr || answerStr.length !== 90 || !answerStr.match(/^[a-d]+$/)) {
-                    console.error('无效的答案字符串:', answerStr);
-                    return;
-                }
-                
-                // 在表单中选中对应的选项
-                for (let i = 0; i < 90; i++) {
-                    const questionName = 'q' + (i + 1);
-                    const value = answerStr[i];
-                    const radio = document.querySelector(`input[name="${questionName}"][value="${value}"]`);
-                    if (radio) {
-                        radio.checked = true;
-                        radio.closest('.option').classList.add('selected');
-                    }
-                }
-                
+            function showResults() {
                 // 计算得分和生成报告
-                const score = calculateScore(answerStr);
-                const report = generateReport(score, answerStr);
+                const score = calculateScore();
+                const report = generateReport(score);
                 
                 // 更新结果页面
                 scoreDisplay.textContent = `你的心理特质得分: ${score}/360`;
                 resultDescription.textContent = report.description;
                 personalityTraits.innerHTML = report.traits;
                 
+                // 加密答案并生成分享链接
+                const answerStr = userAnswers.join('');
+                const encodedAnswers = encrypt(answerStr);
+                const newUrl = window.location.origin + window.location.pathname + '?r=' + encodedAnswers;
+                window.history.replaceState({}, '', newUrl);
+                
                 // 显示分享链接
-                shareUrl.textContent = window.location.href;
+                shareUrl.textContent = newUrl;
                 
                 // 显示结果，隐藏测验
                 quizContainer.style.display = 'none';
@@ -514,7 +550,7 @@
             }
             
             // 计算得分函数
-            function calculateScore(answerStr) {
+            function calculateScore() {
                 let score = 0;
                 
                 // 为每个答案分配分数
@@ -525,15 +561,15 @@
                     'd': 1
                 };
                 
-                for (let i = 0; i < answerStr.length; i++) {
-                    score += scoring[answerStr[i]];
+                for (let i = 0; i < userAnswers.length; i++) {
+                    score += scoring[userAnswers[i]];
                 }
                 
                 return score;
             }
             
             // 生成报告函数
-            function generateReport(score, answerStr) {
+            function generateReport(score) {
                 let description = '';
                 let traits = '<h3>你的主要心理特质：</h3><ul>';
                 
@@ -552,7 +588,7 @@
                     const dimensionNames = ['外向性', '情绪稳定性', '开放性', '宜人性', '尽责性'];
                     const dimension = dimensionNames[dimensionIndex];
                     
-                    const answerValue = answerStr[i];
+                    const answerValue = userAnswers[i];
                     const answerScore = {'a': 4, 'b': 3, 'c': 2, 'd': 1}[answerValue];
                     
                     dimensionScores[dimension] += answerScore;
@@ -597,10 +633,8 @@
                 };
             }
             
-            // 初始化测验
-            generateQuestions();
-            setupOptionListeners();
-            updateProgress();
+            // 初始化测验 - 显示第一题
+            showCurrentQuestion();
         });
     </script>
 </body>
